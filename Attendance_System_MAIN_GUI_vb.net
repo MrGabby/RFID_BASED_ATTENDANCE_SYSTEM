@@ -1,0 +1,171 @@
+Option Explicit On
+Imports System.IO
+Imports System.IO.Ports
+Imports System.Data.SqlClient
+Public Class Form1
+
+Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+
+Dim search As String
+Dim strTest As String
+Dim mins As Integer
+Dim secs As Integer
+Dim counter As Integer
+
+
+Public conn As New SqlConnection
+Public cmd As New SqlCommand
+Public Reader As SqlDataReader
+Public ds As New DataSet
+Public adapter As New SqlDataAdapter
+Public query1, user0 As String
+Dim sql As String
+
+Private Sub Form_Load()
+mins = 0
+Timer3.Enabled = False
+
+Dim baudrate As Integer
+
+Dim serialport As IO.Ports.SerialPort
+serialport = New SerialPort()
+serialport = My.Computer.Ports.OpenSerialPort(ComboBox1.SelectedItem)
+serialport.BaudRate = 9600
+serialport.Parity = Parity.None
+serialport.StopBits = StopBits.One
+serialport.Open()
+
+End Sub
+Private Sub Btnread_Click(sender As Object, e As EventArgs) Handles Btnread.Click
+Try
+Serialport.Open()
+Catch ex As Exception
+MsgBox("readed Again")
+End Try
+
+txtrec.Text = Serialport.ReadLine
+txteno.Text = Serialport.ReadLine
+txtclass.Text = Serialport.ReadLine
+search = txtrec.Text
+
+If (InStr(search, "teacher")) Then   ' when the teacher will swipe the rfid card the word teacher will be sent to the computer
+chk3.Checked = True
+Timer3.Start() ' timer3 is used for timing mins and secs
+Timer4.Start()
+conn.Close()
+End If
+
+If (InStr(search, "stu1") And mins < 6) Then    ' then the student1 will be marked present
+chk4.Checked = True
+conn.Close()
+End If
+
+If (InStr(search, "stu2") And mins < 6) Then    ' then the student1 will be marked present
+chk5.Checked = True
+End If
+
+If (InStr(search, "stu3") And mins < 6) Then    ' then the student1 will be marked present
+chk6.Checked = True
+End If
+End Sub
+
+Private Sub Timer3_Tick(sender As Object, e As EventArgs) Handles Timer3.Tick
+secs = secs + 1
+Label7.Text = secs
+
+If secs > 59 Then
+secs = 0
+mins = mins + 1
+Label8.Text = mins
+End If
+End Sub
+
+Private Sub Timer4_Tick(sender As Object, e As EventArgs) Handles Timer4.Tick
+' sending message to students to let them know that the teacher has arrived.
+' in the controller program each and every user will have its own message sending function in which his number will be specified.
+counter = counter + 1
+Lbl3.Text = counter
+
+If (((counter > 15) And (counter < 20)) And (chk8.Checked = False)) Then
+chk8.Checked = True
+chk9.Checked = True
+chk10.Checked = True
+chk12.Checked = True
+End If
+' check box for parents messages
+
+If ((chk12.Checked = True And ((counter > 30) And (counter < 32) And (chk4.Checked = False)))) Then ' this when checked means all messages are sent
+chk13.Checked = True
+End If
+
+If ((chk12.Checked = True) And ((counter > 33) And (counter < 35) And (chk5.Checked = False))) Then ' this when checked means all messages are sent
+chk14.Checked = True
+End If
+
+If ((chk12.Checked = True) And ((counter > 36) And (counter < 38) And (chk6.Checked = False))) Then ' this when checked means all messages are sent
+chk15.Checked = True
+End If
+
+'**************************************************************************************************
+
+If ((chk8.Checked = True)) Then
+Serialport.Write("a")
+End If
+
+If ((chk9.Checked = True)) Then
+Serialport.Write("b")
+End If
+
+If ((chk10.Checked = True)) Then
+Serialport.Write("c")
+End If
+
+' messages sending to their parents
+
+If ((chk13.Checked = True)) Then
+Serialport.Write("l")
+End If
+
+If ((chk14.Checked = True)) Then
+Serialport.Write("m")
+End If
+
+If ((chk15.Checked = True)) Then
+Serialport.Write("n")
+End If
+
+End Sub
+
+Private Sub Timer2_Tick(sender As Object, e As EventArgs) Handles Timer2.Tick
+TextBox1.Text = Format(Now, "hh:mm:ss") ' time
+TextBox2.Text = Format(Now, "dd/MM/yyyy") 'date
+End Sub
+
+Private Sub Button1_Click(sender As Object, e As EventArgs) Handles bttnexit.Click, bttnexit.Click
+Application.Exit()
+End Sub
+
+Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+ComboBox1.Items.AddRange(Ports.SerialPort.GetPortNames())
+End Sub
+
+Private Sub btnsave_Click(sender As Object, e As EventArgs) Handles btnsave.Click
+
+conn = New SqlConnection
+conn.ConnectionString = ("Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Admin\Documents\aman_final.mdf;Integrated Security=True;")
+Try
+conn.Open()
+MsgBox("connected")
+Dim reader As SqlDataReader
+query1 = "insert into aman_final(Name,EnrollmentNo,Class,date,time) values('" + txtrec.Text + "','" + txteno.Text + "','" + txtclass.Text + "','" + TextBox1.Text + "','" + TextBox2.Text + "')"
+cmd = New SqlCommand(query1, conn)
+reader = cmd.ExecuteReader
+MsgBox("record saved")
+conn.Close()
+Catch ex As SqlException
+MessageBox.Show(ex.Message)
+Finally
+conn.Dispose()
+End Try
+End Sub
+End Class

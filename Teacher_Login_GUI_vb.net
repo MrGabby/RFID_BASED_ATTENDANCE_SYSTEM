@@ -1,0 +1,41 @@
+
+Imports System.Data
+Imports System.Data.SqlClient
+Module sqldatabase
+
+Public conn As New SqlConnection
+Public cmd As New SqlCommand
+Public Reader As SqlDataReader
+Public ds As New DataSet
+Public adapter As New SqlDataAdapter
+Public query, user As String
+
+Public Class Form1
+Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+End Sub
+
+Private Sub btnexit_Click(sender As Object, e As EventArgs) Handles btnexit.Click
+Application.Exit()
+End Sub
+
+Private Sub btnlogin_Click(sender As Object, e As EventArgs) Handles btnlogin.Click
+If txtname.Text = "" Or txtid.Text = "" Or txtpassword.Text = "" Then
+MessageBox.Show("name,id and password required")
+Else
+conn = New SqlConnection("Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Admin\Documents\teacher_database.mdf;Integrated Security=True;")
+conn.Open()
+query = "Select Name,Id,Password from teacher_database where Name='" & txtname.Text & "' and Password='" & txtpassword.Text & "' and Id='" & txtid.Text & "'"
+cmd = New SqlCommand(query, conn)
+reader = cmd.ExecuteReader
+If reader.Read = True Then
+Name = txtname.Text
+Me.Hide()
+studentattendance.Show()
+Else
+MessageBox.Show("name and password invalid")
+End If
+End If
+conn.Close()
+End Sub
+End Class
