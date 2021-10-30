@@ -1,1 +1,6 @@
-# RFID_Tag_code
+    This project is developed by using radio frequency identification (RFID) system and student card to get student attendance.
+Before this project, lecturers needed to use paper to get the students attendance. There was a lot of problem when using the paper as student attendance suggest cheating.
+    This project can help lecturers to reduce this problem by the design of an automatic attendance using RFID and student card. Firstly, lecturer needs to fill form in an interface like lecturer name, subject and subject code. Student information is also needed to be filled in the database.
+     After registration, student need to swipe their card on the reader and the code from the card will be used to compare with the local database.  When the code is match with the database, the student's attendance is marked. This list will be used as a student attendance. As well as students with attendance less than 75% will be marked as detained. 
+     Along with students attendance we can also provide extra information like students data, marks of every student, fee notification and fees data. This project will be helpful to take the attendance of students as well as the staff more easily and automatically. this is for future extension in data base.   
+     As a conclusion, RFID technology can be used in attendance application.
